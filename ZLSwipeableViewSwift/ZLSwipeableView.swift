@@ -38,9 +38,9 @@ public struct ZLSwipeableViewDirection : OptionSetType, CustomStringConvertible 
     public static var Right: ZLSwipeableViewDirection      { return self.init(rawValue: 0b0010) }
     public static var Up: ZLSwipeableViewDirection         { return self.init(rawValue: 0b0100) }
     public static var Down: ZLSwipeableViewDirection       { return self.init(rawValue: 0b1000) }
-    public static var Horizontal: ZLSwipeableViewDirection { return Left | Right }
-    public static var Vertical: ZLSwipeableViewDirection   { return Up | Down }
-    public static var All: ZLSwipeableViewDirection        { return Horizontal | Vertical }
+    public static var Horizontal: ZLSwipeableViewDirection { return [Left, Right] }
+    public static var Vertical: ZLSwipeableViewDirection   { return [Up, Down] }
+    public static var All: ZLSwipeableViewDirection        { return [Horizontal, Vertical] }
     
     public static func fromPoint(point: CGPoint) -> ZLSwipeableViewDirection {
         switch (point.x, point.y) {
@@ -316,9 +316,8 @@ public class ZLSwipeableView: UIView {
             let velocity = recognizer.velocityInView(self)
             let velocityMag = velocity.magnitude
             
-            // let directionChecked = ZLSwipeableViewDirection.fromPoint(translation).intersect(direction) != .None
-            let directionSwiped = ZLSwipeableViewDirection.fromPoint(translation)
-            let directionChecked = directionSwiped & direction != .None
+            let directionSwiped = ZLSwipeableViewDirection.fromPoint(translation).intersect(direction)
+            let directionChecked = directionSwiped != .None && direction != .None
 
             let signChecked = CGPoint.areInSameTheDirection(translation, p2: velocity)
             let translationChecked = abs(translation.x) > translationThreshold * bounds.width ||
